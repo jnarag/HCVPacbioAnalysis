@@ -1,29 +1,26 @@
 from Bio import AlignIO
 import pandas as pd
-import random as r
 from Bio.Seq import Seq
+from Bio import SeqIO
+
+import numpy as np
 
 
 
 def plot_pairwise_diff(fastain, window_size, sliding_window):
 
-
+    AA = ['A', 'R', 'N', 'D', 'C', 'Q', 'E', 'G', 'H', 'I', 'L', 'K', 'M', 'F', 'P', 'S', 'T', 'W', 'Y', 'V']
     aln = AlignIO.read('%s'%fastain, 'fasta')
 
-    indices = range(len(aln))
+    trans_aln = []
 
-    r.shuffle(indices)
+    for i in range(len(aln)):
 
-    random_array = []
+        trans_aln.append(SeqIO.SeqRecord(Seq(str(aln[i].seq).replace('-','N')).translate()))
 
-    for i in range(500):
+    trans_aln = AlignIO.MultipleSeqAlignment(trans_aln)
 
-        random_array.append(aln[indices[i]])
-
-    random_aln = AlignIO.MultipleSeqAlignment(random_array)
-
-
-    seq_length = len(random_aln[1,:])
+    seq_length = len(aln[1,:])
 
     n_windows = seq_length/window_size
 
@@ -38,122 +35,59 @@ def plot_pairwise_diff(fastain, window_size, sliding_window):
 
 
 
-    if(sliding_window):
-        while end < seq_length:
-
-            #print window_size
-            start = (count-1)*sliding_window_size
-
-            print count, start, end, end-start
-
-            if(start >= end):
-                break
-
-            midpoint.append(float((start+end)/2))
-            sub_aln = aln[:,start:end]
-            diff = 0
-            x = 0
-            for s in range(len(sub_aln)-1):
-
-                seq1 = sub_aln[s,:].seq
-                seq2 = sub_aln[(s+1),:].seq
-
-                for b in range(len(seq1)):
-
-                    if(seq1[b] != '-'):
-
-                        if(seq2[b] != '-'):
-
-                            x+=1
-                            if(str(seq1[b]).upper()!=str(seq2[b]).upper()):
-
-                                diff+=1
-
-            print "count", x, float(len(sub_aln)), float(x)/float(len(sub_aln)*window_size), float(diff)/float(x)
-
-            pwd_i = float(diff)/float(x)#float(end-start)/float(len(sub_aln))
-            pwd.append(pwd_i)
-            raw_diff.append(float(diff) / float(len(sub_aln)))
-            end += sliding_window_size
-            count += 1
+    for each in range(n_windows):
 
 
-
-    else:
-
-
-        for each in range(n_windows):
-
-            diff = 0
-            x = 0
+        start = each * window_size
+        end = (each + 1) * window_size
 
 
-            start = each * window_size
-            end = (each + 1) * window_size
+        print start, end, each+1
+        sub_aln = trans_aln[:, each]
+
+        aa_freq = []
+
+        for a in AA:
+
+            align_array = np.array(sub_aln, np.str)
+            aa_freq.append(str(align_array).count(a))
+
+        total_aa_freq = sum(aa_freq)
+
+        diff = 0.0
+        for i in range(0,len(aa_freq)-1):
+
+            freq_i = float(aa_freq[i])/float(total_aa_freq)
+
+            for j in range((i+1), len(aa_freq)):
+
+                freq_j = float(aa_freq[j])/float(total_aa_freq-1)
+
+                diff += freq_i*freq_j
 
 
-            print start, end, each+1
-            sub_aln = random_aln[:, start:end]
-            midpoint.append(float((start + end + 2) / 2))
+        #print diff
+
+        pwd.append(diff)
+        window_no.append(each+1)
 
 
-            for j in range(len(sub_aln)):
-
-                for k in range(len(sub_aln)-1):
-
-                    seq1 = sub_aln[j, :].seq
-                    seq2 = sub_aln[(k + 1), :].seq
-
-                    seq1 = str(seq1).replace('-','N')
-                    seq2 = str(seq2).replace('-','N')
-
-
-                    seq1_aa = Seq(seq1).translate()
-                    seq2_aa = Seq(seq2).translate()
-
-                    #print seq1_aa, seq2_aa
-
-                    for b in range(len(seq1_aa)):
-
-                        if (seq1_aa[b] != 'X'):
-
-                            if (seq2_aa[b] != 'X'):
-
-                                x += 1
-                                if (seq1_aa[b] != seq2_aa[b]):
-                                    diff += 1
-
-            #print x, diff
-
-            #print (each+1), float(diff)/float(end-start)/float(len(sub_aln))
-
-            if x>0:
-
-                print each, float(diff)/x, x
-                pwd_i = float(diff)/x
-            else:
-                pwd_i = float('nan')
-
-            pwd.append(pwd_i)
-            raw_diff.append(float(diff)/float(len(sub_aln)))
-            window_no.append(each+1)
+    return {"codon_no":window_no, "pwd":pwd}
 
 
 
-    print len(pwd), len(raw_diff)
 
-    return {"codon_no":window_no, "mid": midpoint, "pwd":pwd}
 
-#variable called window size, controls how large the windows are
+#variable called window size controls how large the windows are. If window_size = 3, then you will estimate per codon pairwise diversity
 window_size = 3
 
 # sliding window is set to True
 sliding_window = False
 
-fastain1 = str('~/AMC_HCV_DATA/fasta_nt/All_patients_seq/FP7_patient_004_allseqs.fasta')
-fastain2 = str('~/AMC_HCV_DATA/fasta_nt/All_patients_seq/FP7_patient_037_allseqs.fasta')
-fastain3 = str('~/AMC_HCV_DATA/fasta_nt/All_patients_seq/FP7_patient_053.fasta')
-fastain4 = str('~/AMC_HCV_DATA/fasta_nt/All_patients_seq/FP7_patient_061.fasta')
+fastain1 = str('/Users/jayna/Dropbox/AMC_HCV_DATA/fasta_nt/All_patients_seq/FP7_patient_004_allseqs.fasta')
+fastain2 = str('/Users/jayna/Dropbox/AMC_HCV_DATA/fasta_nt/All_patients_seq/FP7_patient_037_allseqs.fasta')
+fastain3 = str('/Users/jayna/Dropbox/AMC_HCV_DATA/fasta_nt/All_patients_seq/FP7_patient_053.fasta')
+fastain4 = str('/Users/jayna/Dropbox/AMC_HCV_DATA/fasta_nt/All_patients_seq/FP7_patient_061.fasta')
 
 p4 = plot_pairwise_diff(fastain1, window_size, sliding_window)
 p37 = plot_pairwise_diff(fastain2, window_size, sliding_window)
@@ -165,8 +99,8 @@ p37_d = pd.DataFrame(data=p37)
 p53_d = pd.DataFrame(data=p53)
 p61_d = pd.DataFrame(data=p61)
 
-p4_d.to_csv("~/figures/pairwise_diversity_codon_E1E2_p4_aa.csv")
-p37_d.to_csv("~/figures/pairwise_diversity_codon_E1E2_p37_aa.csv")
-p53_d.to_csv("~/figures/pairwise_diversity_codon_E1E2_p53_aa.csv")
-p61_d.to_csv("~/figures/pairwise_diversity_codon_E1E2_p61_aa.csv")
+p4_d.to_csv("/Users/jayna/Dropbox/HCV_Pacbio_manuscript/figures/pairwise_diversity_codon_E1E2_p4_aa_new.csv")
+p37_d.to_csv("/Users/jayna/Dropbox/HCV_Pacbio_manuscript/figures/pairwise_diversity_codon_E1E2_p37_aa_new.csv")
+p53_d.to_csv("/Users/jayna/Dropbox/HCV_Pacbio_manuscript/figures/pairwise_diversity_codon_E1E2_p53_aa_new.csv")
+p61_d.to_csv("/Users/jayna/Dropbox/HCV_Pacbio_manuscript/figures/pairwise_diversity_codon_E1E2_p61_aa_new.csv")
 
