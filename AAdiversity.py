@@ -84,10 +84,10 @@ window_size = 3
 # sliding window is set to True
 sliding_window = False
 
-fastain1 = str('/Users/jayna/Dropbox/AMC_HCV_DATA/fasta_nt/All_patients_seq/FP7_patient_004_allseqs.fasta')
-fastain2 = str('/Users/jayna/Dropbox/AMC_HCV_DATA/fasta_nt/All_patients_seq/FP7_patient_037_allseqs.fasta')
-fastain3 = str('/Users/jayna/Dropbox/AMC_HCV_DATA/fasta_nt/All_patients_seq/FP7_patient_053.fasta')
-fastain4 = str('/Users/jayna/Dropbox/AMC_HCV_DATA/fasta_nt/All_patients_seq/FP7_patient_061.fasta')
+fastain1 = str('~FP7_patient_004_allseqs.fasta')
+fastain2 = str('~FP7_patient_037_allseqs.fasta')
+fastain3 = str('~FP7_patient_053.fasta')
+fastain4 = str('~FP7_patient_061.fasta')
 
 p4 = plot_pairwise_diff(fastain1, window_size, sliding_window)
 p37 = plot_pairwise_diff(fastain2, window_size, sliding_window)
@@ -99,8 +99,8 @@ p37_d = pd.DataFrame(data=p37)
 p53_d = pd.DataFrame(data=p53)
 p61_d = pd.DataFrame(data=p61)
 
-p4_d.to_csv("/Users/jayna/Dropbox/HCV_Pacbio_manuscript/figures/pairwise_diversity_codon_E1E2_p4_aa_new.csv")
-p37_d.to_csv("/Users/jayna/Dropbox/HCV_Pacbio_manuscript/figures/pairwise_diversity_codon_E1E2_p37_aa_new.csv")
-p53_d.to_csv("/Users/jayna/Dropbox/HCV_Pacbio_manuscript/figures/pairwise_diversity_codon_E1E2_p53_aa_new.csv")
-p61_d.to_csv("/Users/jayna/Dropbox/HCV_Pacbio_manuscript/figures/pairwise_diversity_codon_E1E2_p61_aa_new.csv")
+p4_d.to_csv("~pairwise_diversity_codon_E1E2_p4_aa_new.csv")
+p37_d.to_csv("~pairwise_diversity_codon_E1E2_p37_aa_new.csv")
+p53_d.to_csv("~pairwise_diversity_codon_E1E2_p53_aa_new.csv")
+p61_d.to_csv("~pairwise_diversity_codon_E1E2_p61_aa_new.csv")
 
