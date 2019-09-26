@@ -7,9 +7,10 @@ import numpy as np
 
 
 
-def plot_pairwise_diff(fastain, window_size, sliding_window):
+def plot_pairwise_diff(fastain, window_size):
 
     AA = ['A', 'R', 'N', 'D', 'C', 'Q', 'E', 'G', 'H', 'I', 'L', 'K', 'M', 'F', 'P', 'S', 'T', 'W', 'Y', 'V']
+    print(len(AA))
     aln = AlignIO.read('%s'%fastain, 'fasta')
 
     trans_aln = []
@@ -55,10 +56,10 @@ def plot_pairwise_diff(fastain, window_size, sliding_window):
         total_aa_freq = sum(aa_freq)
 
         diff = 0.0
-        for i in range(0,len(aa_freq)-1):
+        for i in range(0,len(aa_freq)):
 
             freq_i = float(aa_freq[i])/float(total_aa_freq)
-
+            print(AA[i], freq_i)
             for j in range((i+1), len(aa_freq)):
 
                 freq_j = float(aa_freq[j])/float(total_aa_freq-1)
@@ -84,23 +85,33 @@ window_size = 3
 # sliding window is set to True
 sliding_window = False
 
-fastain1 = str('~FP7_patient_004_allseqs.fasta')
-fastain2 = str('~FP7_patient_037_allseqs.fasta')
-fastain3 = str('~FP7_patient_053.fasta')
-fastain4 = str('~FP7_patient_061.fasta')
+# fastain1 = str('~FP7_patient_004_allseqs.fasta')
+# fastain2 = str('~FP7_patient_037_allseqs.fasta')
+# fastain3 = str('~FP7_patient_053.fasta')
+# fastain4 = str('~FP7_patient_061.fasta')
 
-p4 = plot_pairwise_diff(fastain1, window_size, sliding_window)
-p37 = plot_pairwise_diff(fastain2, window_size, sliding_window)
-p53 = plot_pairwise_diff(fastain3, window_size, sliding_window)
-p61 = plot_pairwise_diff(fastain4, window_size, sliding_window)
+# SARS = "/Users/jayna/Dropbox/coronaviruses/BEAST_analysis/SARS/SARS.spike_glycoprotein.aligned.fasta"
+# SARS_out = plot_pairwise_diff(SARS, window_size)
+# SARS_df = pd.DataFrame(data=SARS_out)
+# SARS_df.to_csv("/Users/jayna/Dropbox/coronaviruses/SARS_spike_glycoprotein_AAdiversity.csv")
 
-p4_d = pd.DataFrame(data=p4)
-p37_d = pd.DataFrame(data=p37)
-p53_d = pd.DataFrame(data=p53)
-p61_d = pd.DataFrame(data=p61)
+# MERS = "/Users/jayna/Dropbox/coronaviruses/BEAST_analysis/MERS/Archive/MERS_CoV_100_CAMEL_spikeglycoprotein_complete.fasta"
+# MERS_out = plot_pairwise_diff(MERS, window_size)
+# MERS_df = pd.DataFrame(data=MERS_out)
+# MERS_df.to_csv("/Users/jayna/Dropbox/coronaviruses/MERS_spike_glycoprotein_AAdiversity_n100.csv")
 
-p4_d.to_csv("~pairwise_diversity_codon_E1E2_p4_aa_new.csv")
-p37_d.to_csv("~pairwise_diversity_codon_E1E2_p37_aa_new.csv")
-p53_d.to_csv("~pairwise_diversity_codon_E1E2_p53_aa_new.csv")
-p61_d.to_csv("~pairwise_diversity_codon_E1E2_p61_aa_new.csv")
+# p4 = plot_pairwise_diff(fastain1, window_size, sliding_window)
+# p37 = plot_pairwise_diff(fastain2, window_size, sliding_window)
+# p53 = plot_pairwise_diff(fastain3, window_size, sliding_window)
+# p61 = plot_pairwise_diff(fastain4, window_size, sliding_window)
+
+# p4_d = pd.DataFrame(data=p4)
+# p37_d = pd.DataFrame(data=p37)
+# p53_d = pd.DataFrame(data=p53)
+# p61_d = pd.DataFrame(data=p61)
+#
+# p4_d.to_csv("~pairwise_diversity_codon_E1E2_p4_aa_new.csv")
+# p37_d.to_csv("~pairwise_diversity_codon_E1E2_p37_aa_new.csv")
+# p53_d.to_csv("~pairwise_diversity_codon_E1E2_p53_aa_new.csv")
+# p61_d.to_csv("~pairwise_diversity_codon_E1E2_p61_aa_new.csv")
 
